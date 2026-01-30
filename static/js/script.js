@@ -66,6 +66,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const formData = new FormData();
         formData.append('file', file);
 
+        // Append Ids if they exist in the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const convId = urlParams.get('convId');
+        const userId = urlParams.get('userId');
+
+        if (convId) formData.append('conversationId', convId);
+        if (userId) formData.append('userId', userId);
+
         // Send to Backend
         fetch('/detect', {
             method: 'POST',
