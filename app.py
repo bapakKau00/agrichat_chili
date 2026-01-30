@@ -42,12 +42,14 @@ def detect():
         return jsonify({'error': 'No selected file'}), 400
     
     if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(filepath)
-        
+        # Process in memory without saving
+        try:
+            image = Image.open(file.stream)
+        except Exception as e:
+             return jsonify({'error': 'Invalid image file'}), 400
+
         if model:
-            results = model(filepath)
+            results = model(image)
             
             # Simple result processing: get the first result's top class name
             try:
@@ -107,12 +109,10 @@ def detect():
                     print(f"Webhook error: {w_err}")
 
                 return jsonify({
-                    'image_url': url_for('static', filename=f'uploads/{filename}'),
                     'diagnosis': diagnosis,
                     'confidence': confidence,
                     'detections': detections # List with single top item
                 })
-
             except Exception as e:
                 return jsonify({'error': f'Inference error: {str(e)}'}), 500
         else:
