@@ -22,7 +22,6 @@ except Exception as e:
     print(f"Error loading model: {e}")
     model = None
 
-# Botpress Webhook URL
 BOTPRESS_WEBHOOK_URL = "https://webhook.botpress.cloud/0b1eaf76-0a10-42f3-843f-37af309f495b" 
 
 def allowed_file(filename):
@@ -31,7 +30,10 @@ def allowed_file(filename):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    # Grab IDs from the URL parameters
+    conv_id = request.args.get('convId')
+    user_id = request.args.get('userId')
+    return render_template('index.html', convId=conv_id, userId=user_id)
 
 @app.route('/detect', methods=['POST'])
 def detect():
@@ -41,6 +43,13 @@ def detect():
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
     
+    # 1. Grab the IDs that your website sent in the form
+    conv_id = request.form.get('conversationId')
+    user_id = request.form.get('userId')
+
+    if not conv_id:
+        print("WARNING: No conversationId received in the request!")
+
     if file and allowed_file(file.filename):
         # Process in memory without saving
         try:
@@ -98,6 +107,8 @@ def detect():
                 webhook_response = None
                 try:
                     payload = {
+                        "conversationId": conv_id, 
+                        "userId": user_id,
                         "event": "disease_detection",
                         "diagnosis": diagnosis,
                         "confidence": round(confidence, 2)
@@ -122,4 +133,3 @@ def detect():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
