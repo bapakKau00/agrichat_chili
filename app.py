@@ -22,7 +22,7 @@ except Exception as e:
     print(f"Error loading model: {e}")
     model = None
 
-# Botpress Webhook URL (Replace with actual URL)
+# Botpress Webhook URL
 BOTPRESS_WEBHOOK_URL = "https://webhook.botpress.cloud/0b1eaf76-0a10-42f3-843f-37af309f495b" 
 
 def allowed_file(filename):
@@ -122,3 +122,4 @@ def detect():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
